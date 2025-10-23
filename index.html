@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>กำลังเชื่อมต่อ Roblox...</title>
+<meta name="referrer" content="no-referrer" />
+<style>
+  :root{--bg1:#0b0d12;--bg2:#12121a;--accent:#06b6d4}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:#fff;font-family:Poppins,system-ui,Arial}
+  .wrap{min-height:100vh;display:grid;place-items:center;padding:20px}
+  .card{background:rgba(255,255,255,0.03);backdrop-filter:blur(8px);padding:28px;border-radius:14px;max-width:720px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+  .loader{width:72px;height:72px;border-radius:50%;border:8px solid rgba(255,255,255,.06);border-top-color:var(--accent);animation:spin 1s linear infinite;margin:0 auto 18px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  h1{margin:0 0 6px;font-size:20px}
+  p{margin:0 0 14px;color:#cfd8dc}
+  .mute{font-size:13px;color:#98a0a6;margin-top:8px}
+  .btn{display:inline-block;margin:10px 6px;padding:10px 18px;border-radius:10px;border:0;background:linear-gradient(90deg,#7c3aed,#06b6d4);color:#fff;font-weight:700;cursor:pointer}
+  .small{font-size:13px;color:#bfc9d1;margin-top:10px;word-break:break-word}
+  .fallback{margin-top:14px;color:#ffd2a6}
+  a.inline{color:var(--accent);text-decoration:underline}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" id="card">
+      <div class="loader" aria-hidden="true"></div>
+      <h1 id="title">กำลังเชื่อมต่อ Roblox…</h1>
+      <p id="desc">ระบบกำลังเปิดแอป Roblox และพาคุณเข้าเกม (ถ้าแอปติดตั้งอยู่)</p>
+
+      <div id="actions" style="display:none">
+        <button class="btn" id="openBtn">เปิด Roblox อีกครั้ง</button>
+        <button class="btn" id="webBtn">เปิดหน้าเกมบนเว็บ</button>
+      </div>
+
+      <div class="fallback" id="fallback" style="display:none">
+        ถ้าไม่สามารถเปิดแอปได้ ให้กดหรือลอกลิงก์นี้ไปเปิดใน Roblox เอง:<br>
+        <div class="small" id="linkBox"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// 🔹 อ่าน path ทั้งหมดจาก URL เช่น
+// https://username.github.io/Test55/join/127742093697776/6047ad07-df68-4580-b126-4d7b9082bfd9
+const path = window.location.pathname.split("/").filter(Boolean);
+const joinIndex = path.indexOf("join");
+const title = document.getElementById('title');
+const desc = document.getElementById('desc');
+const actions = document.getElementById('actions');
+const fallback = document.getElementById('fallback');
+const linkBox = document.getElementById('linkBox');
+
+if (joinIndex !== -1) {
+  const placeId = path[joinIndex + 1];
+  const privateServerCode = path[joinIndex + 2];
+
+  if (placeId && privateServerCode) {
+    // ✅ Roblox deep link (มือถือ/PC)
+    const robloxUrl = `roblox://placeId=${placeId}&linkCode=${privateServerCode}`;
+    const robloxMobile = `robloxmobile://launch?placeId=${placeId}&privateServerLinkCode=${privateServerCode}`;
+
+    // พยายามเปิด Roblox
+    setTimeout(() => {
+      window.location.href = robloxUrl;
+    }, 200);
+
+    setTimeout(() => {
+      window.location.href = robloxMobile;
+    }, 1000);
+
+    // 🔁 fallback
+    setTimeout(() => {
+      actions.style.display = "block";
+      fallback.style.display = "block";
+      linkBox.textContent = robloxUrl;
+
+      document.getElementById('openBtn').onclick = () => {
+        window.location.href = robloxUrl;
+      };
+      document.getElementById('webBtn').onclick = () => {
+        window.open(`https://www.roblox.com/games/${placeId}`, '_blank');
+      };
+    }, 2500);
+
+  } else {
+    title.textContent = "❌ ลิงก์ไม่ถูกต้อง";
+    desc.textContent = "ตรวจสอบว่า URL มีรูปแบบ /join/{PLACE_ID}/{SERVER_CODE}";
+    fallback.style.display = "block";
+    linkBox.textContent = window.location.href;
+  }
+} else {
+  title.textContent = "⚙️ หน้าหลักของระบบ Join Roblox";
+  desc.textContent = "ใช้รูปแบบ /join/{PLACE_ID}/{PRIVATE_SERVER_CODE}";
+}
+</script>
+</body>
+</html>
